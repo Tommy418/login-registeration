@@ -1,3 +1,11 @@
+<?php
+  session_start();
+
+  $_SESSION['user_array']['name'];
+ if(!isset($_SESSION['user_array'])){
+   header('location: login.php');
+ } 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +30,7 @@
           <a class="nav-link active" aria-current="page" href="index.php">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="admin/admin.php">Admin</a>
+          <a class="nav-link" href="admin.php">Admin</a>
         </li>
       </ul>
     </div>

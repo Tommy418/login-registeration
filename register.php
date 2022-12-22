@@ -37,17 +37,25 @@
         if(empty($password)){
             $passwordError = "password need to fill";
         }
-        if($confirm_password!=$password){
-            $confirm_passwordError = "confirm passowrd need to fill";
+        if (empty($confirm_password)){
+          $confirm_passwordError = "confirm password need to fill";
         }
-        
-        if (!empty($name) && !empty($email) && !empty($address)&& !empty($password)){
+        if($confirm_password!=$password){
+            $confirm_passwordError = "The password does not match";
+        }
+
+        if (!empty($name) && !empty($email) && !empty($address)&& !empty($password)&& !empty($confirm_password)&& $confirm_password==$password){
+         
+          $encrptPassword = md5($password); 
+
             $query ="INSERT INTO user(name,email,address,password) VALUES('$name','$email',
-            '$address','$password')";
+            '$address','$encrptPassword')";
 
             $result = mysqli_query($dbconnection,$query);
             if($result == true){
                 echo"<script> alert('registration successfully')</script>";
+                 header ('location: login.php'); 
+                
             }else{
                 die('Error:'. mysqli_error($query));
             }
@@ -75,7 +83,7 @@
           <a class="nav-link" href="register.php">Register</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="admin/admin.php">Admin</a>
+          <a class="nav-link" href="admin.php">Admin</a>
         </li>
       </ul>
     </div>
@@ -89,27 +97,27 @@
         <form action="register.php" method="POST">
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Name</label>
-    <input type="text" name="name" class="form-control" id="exampleInputEmail1" >
+    <input type="text" name="name" class="form-control <?php if($nameError !="") {?> is-invalid <?php }?>" id="exampleInputEmail1 " value="<?php echo $name?>">
     <i class="text-danger">
         <?php echo $nameError?>
     </i>
 <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Email</label>
-    <input type="email" name="email" class="form-control" id="exampleInputPassword1">
+    <input type="email" name="email" class="form-control <?php if($emailError !="") {?> is-invalid <?php }?>" id="exampleInputPassword1" value="<?php echo $email?>" >
     <i class="text-danger">
         <?php echo $emailError?>
     </i>
   </div>
   <div class="mb-3">
   <label for="exampleFormControlTextarea1" class="form-label">Address</label>
-  <textarea class="form-control" name="address" id="exampleFormControlTextarea1" rows="3"></textarea>
+  <textarea class="form-control <?php if($addressError !="") {?> is-invalid <?php }?>" name="address" id="exampleFormControlTextarea1" rows="3"><?php echo $address?></textarea>
   <i class="text-danger">
         <?php echo $addressError?>
     </i>
 </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">password</label>
-    <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+    <input type="password" name="password" class="form-control <?php if($passwordError !="") {?> is-invalid <?php }?>" id="exampleInputPassword1" value="<?php echo $password?>">
     <i class="text-danger">
         <?php echo $passwordError?>
     </i>
@@ -119,7 +127,7 @@
     <i class="text-danger">
         <?php echo $confirm_passwordError?>
     </i>
-    <input type="password" name="confirm_password" class="form-control" id="exampleInputPassword1">
+    <input type="password" name="confirm_password" class="form-control <?php if($confirm_passwordError !="") {?> is-invalid <?php }?>" id="exampleInputPassword1" value="<?php echo $confirm_password?>">
   </div>
   <button type="submit" name="register_button" class="btn btn-primary">Submit</button>
 </form>
