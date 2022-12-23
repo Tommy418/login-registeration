@@ -24,9 +24,14 @@
         $user_count = mysqli_num_rows($user_result);
 
        if($user_count === 1){
-        $user_array = mysqli_fetch_assoc($user_result);
+        $user_array = mysqli_fetch_assoc($user_result); 
         $_SESSION['user_array']= $user_array;
-         header('location: admin.php');
+        if($user_array['role']=='admin'){  
+          header('location: admin.php');
+        }else{
+          header('location: user-dashboard.php');
+        }
+        
        }else {
          $error = "Invalid email or password";
        }
@@ -65,7 +70,7 @@
         <form action="login.php" method="POST">
        <?php if($error !=""): ?> 
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong> <?php echo $error; ?></strong> 
+        <strong> <?php  echo $error; ?></strong> 
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       <?php endif ?>

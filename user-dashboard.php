@@ -6,9 +6,10 @@
  if(!isset($_SESSION['user_array'])){
    header('location: login.php');
  } else{
-    if($_SESSION['user_array']['role'] != 'admin'){
-      header('location: user.php');
- }}
+ if($_SESSION['user_array']['role'] != 'user'){
+  header('location: admin.php');
+}}
+ 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +22,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 </head>
 <body>
+
 <div class="container">
 <nav class="navbar navbar-expand-lg bg-light">
   <div class="container-fluid">
@@ -32,9 +34,6 @@
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="index.php">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="admin.php">Admin</a>
         </li>
 
            <div>
@@ -51,13 +50,14 @@
 <div class="container">
   <div class="row">
     <div class="col-md-4">
-      <div class="card ">
+      <div class="card text-white bg-info">
         <div class="card-body">
-            <h4>Admin Info</h4>
+            <h4>user Info</h4>
             <div>
             Role:
               <span class=" bg-success text-white badge badge "> <?php echo $_SESSION['user_array']['role']?></span>   
             </div>
+            <div>
             <div>
                Name: <?php echo $_SESSION['user_array']['name']?>
             </div>
@@ -70,44 +70,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-8">
-    <table class="table ">
-  <thead class="bg-info">
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
-      <th scope="col">Address</th>
-      <th scope="col">Password</th>
-      <th scope="col">Role</th>
-      <th scope="col">Edit</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-      $query ="SELECT * FROM user";
-      $result =mysqli_query($dbconnection,$query);
-      foreach($result as $user){
-          ?>
-          <tr>
-      <th scope="row"><?php echo $user['id']?></th>
-      <th scope="row"><?php echo $user['name']?></th>
-      <th scope="row"><?php echo $user['email']?></th>
-      <th scope="row"><?php echo $user['address']?></th>
-      <th scope="row"><?php echo $user['password']?></th>
-      <th scope="row"><?php echo $user['role']?></th>
-      <th scope="row"> 
-        <div class="d-flex justify-content-start">
-            <a href="" class="btn btn-info btn-sm">Edit</a>
-            <button class="btn btn-danger btn-sm">Delete </button></th>
-             </tr>
-            </div>
-    <?php
-     }
-    ?>
-  </tbody>
-</table>
-    </div>
+   
   </div>
 
 </div>
