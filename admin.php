@@ -21,6 +21,74 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 </head>
 <body>
+  <?php
+        //aunthenticated user data
+        $auth_user_id = $_SESSION['user_array'] ['id'];
+        $auth_user_result = mysqli_query($dbconnection,"SELECT * FROM user WHERE id =$auth_user_id");
+        if($auth_user_result) {
+          $auth_user_array = mysqli_fetch_array($auth_user_result);
+        } else {
+          die ('Error:' .mysqli_error($dbconnection));
+        }
+    
+    //user edit
+    $card_edition_form_status=false;
+    if(isset($_GET['user_id_to_update'])){
+               $card_edition_form_status=true;
+              $user_id_to_update = $_GET['user_id_to_update'];
+              $query="SELECT *FROM user WHERE id= $user_id_to_update";
+               $result = mysqli_query($dbconnection,$query);
+             if($result){
+               $user = mysqli_fetch_assoc($result);
+
+             }else{
+              die('Error'.$dbconnection);
+             }
+
+    }
+    //User Update
+    if(isset($_POST['user_update_button'])){
+      $user_id = $_POST['user_id'];
+       $name = $_POST['name'];
+       $email = $_POST['email'];
+       $address = $_POST['address'];
+       $role      = $_POST['role'];
+
+       $user_result = mysqli_query($dbconnection,"SELECT * FROM user WHERE id=$user_id");
+       $user_array = mysqli_fetch_assoc($user_result);
+       $old_password = $user_array['password'];
+
+       $input_password = $_POST['password'];
+
+       $new_password = $old_password != $input_password ? md5($input_password) : $input_password;
+
+      
+       
+
+       $query ="UPDATE user SET name='$name', email='$email',address='$address',password='$new_password',`role`='$role' WHERE id=$user_id";
+
+       $result = mysqli_query($dbconnection,$query);
+
+       if($result){
+          echo"<script> Updated successfully</script>";
+          header('location: admin.php');
+       }  else{
+              die('Error:'.mysqli_error($dbconnection));
+       }
+    }
+      //user Delete
+      if(isset($_REQUEST['user_id_to_delete'])){
+          $user_id_delete = $_REQUEST['user_id_to_delete'];
+
+          $result = mysqli_query($dbconnection,"DELETE FROM user WHERE id=$user_id_delete");
+          if ($result){
+            echo "<script> alert('A user deleted successfully')</script>";
+            header('location: admin.php');
+          }else {
+            die('Error:'. mysqli_error($dbconnection));
+          }
+      }
+  ?>
 <div class="container">
 <nav class="navbar navbar-expand-lg bg-light">
   <div class="container-fluid">
@@ -56,24 +124,61 @@
             <h4>Admin Info</h4>
             <div>
             Role:
-              <span class=" bg-success text-white badge badge "> <?php echo $_SESSION['user_array']['role']?></span>   
+              <span class=" bg-success text-white badge badge "> <?php echo $auth_user_array['role']?></span>   
             </div>
             <div>
-               Name: <?php echo $_SESSION['user_array']['name']?>
+               Name: <?php echo $auth_user_array['name']?>
             </div>
             <div>
-               email: <?php echo $_SESSION['user_array']['email']?>
+               email: <?php echo $auth_user_array['email']?>
             </div>
             <div>
-               address: <?php echo $_SESSION['user_array']['address']?>
+               address: <?php echo $auth_user_array['address']?>
             </div>
         </div>
       </div>
+      <?php if($card_edition_form_status == true): ?>
+      <div class="card mt-3">
+        <div class="card-header">User Edition Form</div>
+        <form action="<?php echo $_SERVER['PHP_SELF']?>" method="POST" >
+            <div class="card-body">
+              <input type ="hidden" name="user_id" value="<?php echo $user['id'] ;?>">
+              <div class="form-group">
+                <label for=""> Name:</label>
+                <input type="text" name="name" class="form-control" value="<?php echo $user['name']?>">
+              </div>
+              <div class="form-group">
+                <label for=""> Email</label>
+                <input type="text" name="email" class="form-control" value ="<?php echo $user['email']?>">
+              </div>
+              <div class="form-group">
+                <label for=""> Address</label>
+                <textarea name="address" id="" class="form-control"><?php echo $user['address']?></textarea>
+              </div>
+              <div class="form-group">
+                <label for=""> Password</label>
+                <input type="text" name="password" class="form-control" value ="<?php echo $user['password']?>">
+              </div>
+              <div class="form-group ">
+              <label for=""> Role</label>
+                <select name="role" id="" class="form-control">
+                  <option value="">Select Role</option>
+                  <option value="admin" <?php if( $user['role']=='admin'){?> selected <?php } ?>> Admin</option>
+                  <option value="user"  <?php if( $user ['role'] =='user'){?> selected <?php } ?>> User</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-footer">
+                <button name= "user_update_button" class="btn btn-info text-white submit">Update</button>
+            </div>
+        </form>  
+      </div>
+      <?php endif ?>
     </div>
     <div class="col-md-8">
     <table class="table ">
   <thead class="bg-info">
-    <tr>
+    <tr class="text-white">
       <th scope="col">ID</th>
       <th scope="col">Name</th>
       <th scope="col">Email</th>
@@ -90,16 +195,17 @@
       foreach($result as $user){
           ?>
           <tr>
-      <th scope="row"><?php echo $user['id']?></th>
-      <th scope="row"><?php echo $user['name']?></th>
-      <th scope="row"><?php echo $user['email']?></th>
-      <th scope="row"><?php echo $user['address']?></th>
-      <th scope="row"><?php echo $user['password']?></th>
-      <th scope="row"><?php echo $user['role']?></th>
+      <th scope="row"><?php echo $user['id'];?></th>
+      <th scope="row"><?php echo $user['name'];?></th>
+      <th scope="row"><?php echo $user['email'];?></th>
+      <th scope="row"><?php echo $user['address'];?></th>
+      <th scope="row"><?php echo $user['password'];?></th>
+      <th scope="row"><?php echo $user['role'];?></th>
       <th scope="row"> 
         <div class="d-flex justify-content-start">
-            <a href="" class="btn btn-info btn-sm">Edit</a>
-            <button class="btn btn-danger btn-sm">Delete </button></th>
+            <a href="admin.php?user_id_to_update=<?php echo $user['id'];?>" class="btn btn-info btn-sm text-white">Edit</a>
+            <a href="admin.php?user_id_to_delete=<?php echo $user['id'];?>" class="btn btn-danger btn-sm text-white">Delete</a>
+            
              </tr>
             </div>
     <?php
